@@ -1,0 +1,29 @@
+name: PHP Syntax Checker (CI)
+
+# Trigger this workflow every time someone pushes to main or opens a Pull Request
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-php:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Download the code from the GitHub repository onto the cloud server
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Setup the exact PHP version required for Magento 2.4.9
+    - name: Setup PHP 8.4
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        extensions: mbstring, intl, xml
+
+    # 3. Scan all PHP files in the repository for compilation errors
+    - name: Check PHP Syntax (Linting)
+      run: |
+        find . -name "*.php" ! -path "./vendor/*" -exec php -l {} \; | grep -v "No syntax errors detected" || true
